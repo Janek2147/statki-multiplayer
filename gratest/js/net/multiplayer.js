@@ -34,6 +34,23 @@ export function createMultiplayer() {
     toast(`${m.byNick || "Użytkownik"} odrzucił zaproszenie`);
   });
 
+  ws.on("rematchOffer", (m) => {
+    const fromNick = m.fromNick || "Ktoś";
+    const ok = window.confirm(`${fromNick} proponuje rewanż. Gramy?`);
+    ws.send({ type: "rematchResponse", accepted: ok });
+  });
+
+  ws.on("rematchDeclined", (m) => {
+    toast(`${m.byNick || "Użytkownik"} odrzucił rewanż`);
+  });
+
+  ws.on("rematchStart", (m) => {
+    state.battleStarterId = m.starterId || null;
+    state.readyA = false;
+    state.readyB = false;
+    toast("Rewanż!");
+  });
+
   ws.on("roomStart", (m) => {
     const myId = state.myId;
     if (!myId) return;
@@ -111,4 +128,8 @@ export function mpSendShotResult(mp, toId, idx, result, win) {
 
 export function mpSendShotResultWithUpdates(mp, toId, idx, result, win, updates) {
   mp.ws.send({ type: "shotResult", toId, idx, result, win, updates });
+}
+
+export function mpOfferRematch(mp) {
+  mp.ws.send({ type: "rematchOffer" });
 }

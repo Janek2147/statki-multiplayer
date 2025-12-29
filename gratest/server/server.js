@@ -48,6 +48,10 @@ function getOpponent(room, selfId) {
   return room.aId === selfId ? room.bId : room.aId;
 }
 
+function swapStarter(room) {
+  room.starterId = room.starterId === room.aId ? room.bId : room.aId;
+}
+
 function leaveRoom(clientId) {
   const c = clients.get(clientId);
   if (!c?.roomId) return;
@@ -89,6 +93,45 @@ wss.on("connection", (ws) => {
 
     const c = clients.get(id);
     if (!c) return;
+
+    if (msg.type === "rematchOffer") {
+      const roomId = c.roomId;
+      const room = roomId ? rooms.get(roomId) : null;
+      if (!room) return;
+
+      const oppId = getOpponent(room, id);
+      const opp = clients.get(oppId);
+      if (!opp) return;
+
+      send(opp.ws, { type: "rematchOffer", fromId: id, fromNick: c.nick });
+      return;
+    }
+
+    if (msg.type === "rematchResponse") {
+      const roomId = c.roomId;
+      const room = roomId ? rooms.get(roomId) : null;
+      if (!room) return;
+
+      const accepted = !!msg.accepted;
+      const oppId = getOpponent(room, id);
+      const opp = clients.get(oppId);
+      if (!opp) return;
+
+      if (!accepted) {
+        send(opp.ws, { type: "rematchDeclined", byId: id, byNick: c.nick });
+        return;
+      }
+
+      room.readyA = false;
+      room.readyB = false;
+      swapStarter(room);
+
+      const a = clients.get(room.aId);
+      const b = clients.get(room.bId);
+      if (a) send(a.ws, { type: "rematchStart", starterId: room.starterId });
+      if (b) send(b.ws, { type: "rematchStart", starterId: room.starterId });
+      return;
+    }
 
     if (msg.type === "setNick") {
       const nick = String(msg.nick || "").trim().slice(0, 18);

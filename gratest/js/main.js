@@ -5,6 +5,8 @@ import { BattleController } from "./ui/controllers/BattleController.js";
 import { toast } from "./ui/toast.js";
 import { createMultiplayer, mpConnect, mpIsInRoom, mpLeaveRoom } from "./net/multiplayer.js";
 import { UsersPanel } from "./ui/usersPanel.js";
+import { createOverlay } from "./ui/overlay.js";
+import { mpOfferRematch } from "./net/multiplayer.js";
 
 const app = document.getElementById("app");
 const btnNew = document.getElementById("btnNew");
@@ -15,6 +17,8 @@ let battleController;
 
 const mp = createMultiplayer();
 mpConnect(mp);
+
+const overlay = createOverlay();
 
 let usersPanel;
 let unsubPresence;
@@ -56,7 +60,39 @@ function startNewGame({ mode = "solo" } = {}) {
     onStartBattle: () => {
       placementController.dispose();
       placementController = null;
-      battleController = new BattleController(game);
+      battleController = new BattleController(game, {
+        onFinished: (msg) => {
+          const inRoom = mpIsInRoom(mp);
+          overlay.show({
+            title: msg,
+            body: inRoom
+              ? "Chcesz zagrać rewanż z tym samym graczem?"
+              : "Zagrać jeszcze raz?",
+            actions: [
+              {
+                label: "Nowa gra",
+                variant: "btn--primary",
+                onClick: () => {
+                  overlay.hide();
+                  if (inRoom) mpLeaveRoom(mp);
+                  startNewGame({ mode: "solo" });
+                },
+              },
+              ...(inRoom
+                ? [
+                    {
+                      label: "Rewanż",
+                      onClick: () => {
+                        overlay.hide();
+                        mpOfferRematch(mp);
+                      },
+                    },
+                  ]
+                : []),
+            ],
+          });
+        },
+      });
       toast("Powodzenia! Atakuj planszę przeciwnika.");
     },
   });
@@ -78,4 +114,20 @@ mp.ws.on("roomStart", () => {
   startNewGame({ mode: "multi" });
 });
 
+mp.ws.on("rematchStart", () => {
+  startNewGame({ mode: "multi" });
+});
+
 startNewGame({ mode: "solo" });
+
+overlay.show({
+  title: "Witaj!",
+  body: "Rozstaw flotę i kliknij Start.\n\nMultiplayer: ustaw nick i kliknij gracza na liście, żeby go zaprosić.",
+  actions: [
+    {
+      label: "OK",
+      variant: "btn--primary",
+      onClick: () => overlay.hide(),
+    },
+  ],
+});

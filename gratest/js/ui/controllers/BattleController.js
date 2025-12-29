@@ -6,8 +6,9 @@ import { toast } from "../toast.js";
 import { mpIsInRoom, mpSendShot, mpSendShotResultWithUpdates } from "../../net/multiplayer.js";
 
 export class BattleController {
-  constructor(game) {
+  constructor(game, { onFinished } = {}) {
     this.game = game;
+    this.onFinished = onFinished;
     this.unsubs = [];
     this.busy = false;
     this.disposed = false;
@@ -204,6 +205,7 @@ export class BattleController {
     this.game.phase = "finished";
     this.game.ui.status.textContent = message;
     toast(message, 1800);
+    this.onFinished?.(message);
   }
 
   refresh() {
