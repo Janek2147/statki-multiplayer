@@ -59,15 +59,22 @@ body{
     gap:12px;
   }
 
-  .content{gap:12px;}
+  .content{
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+
+  #leftPanel{grid-column: 1;}
+  #rightPanel{grid-column: 2;}
+  #sidePanel{grid-column: 1 / -1;}
 
   .panel__header{padding:12px 12px 10px;}
 
   .board{
-    padding:12px;
-    gap:5px;
-    max-width: 460px;
-    margin: 0 auto;
+    padding:10px;
+    gap:4px;
+    max-width:none;
+    margin: 0;
   }
 
   .toolbar{padding:10px 12px 12px;}
@@ -182,11 +189,27 @@ body{
 }
 
 .cell--miss{
-  border-color: rgba(234,240,255,.16);
+  border-color: rgba(106,166,255,.28);
   background:
-    radial-gradient(10px 10px at 50% 50%, rgba(234,240,255,.85), rgba(234,240,255,.08) 65%, transparent 72%),
-    radial-gradient(22px 22px at 50% 50%, rgba(106,166,255,.10), transparent 65%),
-    linear-gradient(180deg, rgba(34,49,92,.9), rgba(24,35,72,.75));
+    radial-gradient(22px 22px at 50% 50%, rgba(234,240,255,.20), rgba(234,240,255,.04) 58%, transparent 60%),
+    linear-gradient(180deg, rgba(106,166,255,.18), rgba(124,92,255,.10)),
+    linear-gradient(180deg, rgba(34,49,92,.92), rgba(24,35,72,.80));
+}
+
+.cell--miss::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:14px;
+  height:14px;
+  border-radius:999px;
+  transform: translate(-50%, -50%) scale(.7);
+  box-shadow: 0 0 0 0 rgba(234,240,255,.0);
+  background: radial-gradient(circle, rgba(234,240,255,.85), rgba(234,240,255,.15) 55%, rgba(234,240,255,0) 70%);
+  opacity:.85;
+  animation: missRipple 1.15s ease-out infinite;
+  pointer-events:none;
 }
 
 .cell--hit{
@@ -288,7 +311,9 @@ body{
   position:relative;
   width:min(520px, 100%);
   border:1px solid rgba(255,255,255,.12);
-  background: linear-gradient(180deg, rgba(18,28,58,.92), rgba(15,24,54,.88));
+  background: radial-gradient(600px 260px at 30% 0%, rgba(106,166,255,.22), transparent 55%),
+              radial-gradient(520px 240px at 80% 20%, rgba(124,92,255,.18), transparent 60%),
+              linear-gradient(180deg, rgba(18,28,58,.92), rgba(15,24,54,.88));
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding:16px;
@@ -296,7 +321,13 @@ body{
 
 .overlay__title{font-weight:800;font-size:18px;}
 .overlay__body{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.45;white-space:pre-line;}
-.overlay__actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.overlay__actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end;}
+
+@keyframes missRipple{
+  0%{transform: translate(-50%, -50%) scale(.65); opacity:.80; filter: blur(0);}
+  55%{opacity:.45;}
+  100%{transform: translate(-50%, -50%) scale(2.6); opacity:0; filter: blur(.2px);}
+}
 
 @keyframes hitPop{
   0%{transform: scale(.92);}

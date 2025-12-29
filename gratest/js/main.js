@@ -121,11 +121,14 @@ mp.ws.on("rematchStart", () => {
 startNewGame({ mode: "solo" });
 
 overlay.show({
-  title: "Witaj!",
-  body: "Rozstaw flotę i kliknij Start.\n\nMultiplayer: ustaw nick i kliknij gracza na liście, żeby go zaprosić.",
+  title: "Menu",
+  body:
+    "Tryb solo: rozstaw flotę i kliknij Start.\n\n" +
+    "Multiplayer: ustaw nick, kliknij gracza na liście, wyślij zaproszenie i zagrajcie 1vs1.\n\n" +
+    "Tip: po zatopieniu statku pola dookoła oznaczają się automatycznie.",
   actions: [
     {
-      label: "OK",
+      label: "Graj",
       variant: "btn--primary",
       onClick: () => overlay.hide(),
     },
