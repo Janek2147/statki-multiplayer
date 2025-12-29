@@ -18,6 +18,9 @@ export function renderStaticUI(game) {
   const playerBoardEl = qs("#playerBoard");
   const enemyBoardEl = qs("#enemyBoard");
 
+  const leftPanel = qs("#leftPanel");
+  const rightPanel = qs("#rightPanel");
+
   const playerCells = renderBoardGrid(playerBoardEl);
   const enemyCells = renderBoardGrid(enemyBoardEl);
 
@@ -28,6 +31,8 @@ export function renderStaticUI(game) {
     enemyMeta,
     playerBoardEl,
     enemyBoardEl,
+    leftPanel,
+    rightPanel,
     playerCells,
     enemyCells,
     placementToolbar: qs("#placementToolbar"),

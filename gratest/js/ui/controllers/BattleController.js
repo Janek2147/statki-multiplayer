@@ -117,6 +117,14 @@ export class BattleController {
         if (!idxRaw) return;
 
         const idx = Number(idxRaw);
+        if (!Number.isFinite(idx)) return;
+
+        const alreadyShot = this.game.enemy.board.shots[idx] !== null;
+        if (alreadyShot) {
+          toast("To pole było już sprawdzone");
+          return;
+        }
+
         if (this.game.mode === "multi" && this.game.multiplayer && mpIsInRoom(this.game.multiplayer)) {
           mpSendShot(this.game.multiplayer, idx);
           this.waitingForRemoteResult = true;
@@ -212,6 +220,17 @@ export class BattleController {
     if (this.disposed) return;
     paintBoard({ board: this.game.player.board, cells: this.game.ui.playerCells, showShips: true });
     paintBoard({ board: this.game.enemy.board, cells: this.game.ui.enemyCells, showShips: false });
+
+    if (this.game.ui.leftPanel && this.game.ui.rightPanel) {
+      this.game.ui.leftPanel.classList.toggle(
+        "panel--turn",
+        this.game.phase === "battle" && this.game.turn === "player"
+      );
+      this.game.ui.rightPanel.classList.toggle(
+        "panel--turn",
+        this.game.phase === "battle" && this.game.turn === "enemy"
+      );
+    }
 
     const pLeft = countUnsunkShips(this.game.player.board);
     const eLeft =
