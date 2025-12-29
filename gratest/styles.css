@@ -205,12 +205,12 @@ body{
 }
 
 .cell--hit{
-  background: radial-gradient(18px 18px at 50% 50%, rgba(251,113,133,.9), rgba(251,113,133,.15));
+  background: radial-gradient(18px 18px at 50% 50%, rgba(251,191,36,.95), rgba(251,191,36,.15));
   animation: hitPop .28s ease-out;
 }
 
 .cell--sunk{
-  background: radial-gradient(18px 18px at 50% 50%, rgba(251,191,36,.95), rgba(251,191,36,.15));
+  background: radial-gradient(18px 18px at 50% 50%, rgba(251,113,133,.9), rgba(251,113,133,.15));
   animation: sunkGlow .55s ease-out;
 }
 
