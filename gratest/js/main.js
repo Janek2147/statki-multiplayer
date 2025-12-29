@@ -143,15 +143,6 @@ function showMenu() {
         onClick: () => overlay.hide(),
       },
       {
-        label: "Nowa gra",
-        onClick: () => {
-          overlay.hide();
-          if (mpIsInRoom(mp)) mpLeaveRoom(mp);
-          startNewGame({ mode: "solo" });
-          toast("Nowa gra");
-        },
-      },
-      {
         label: "Instrukcja",
         onClick: () => {
           overlay.show({
