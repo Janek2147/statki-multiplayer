@@ -83,7 +83,12 @@ export class PlacementController {
     this.unsubs.push(
       on(document, "keydown", (e) => {
         if (this.game.phase !== "placement") return;
-        if (e.key.toLowerCase() === "r") {
+        const key = String(e.key || "");
+        const lower = key.toLowerCase();
+        const isRotate = lower === "r" || key === " " || e.code === "Space";
+
+        if (isRotate) {
+          if (key === " " || e.code === "Space") e.preventDefault();
           this.game.orientation =
             this.game.orientation === ORIENTATION.H ? ORIENTATION.V : ORIENTATION.H;
           this.refresh();
@@ -187,7 +192,7 @@ export class PlacementController {
   }
 
   refresh() {
-    const { shipPicker, orientationPicker, btnStart } = this.game.ui;
+    const { shipPicker, orientationPicker, btnStart, playerBoardEl } = this.game.ui;
 
     for (const node of Array.from(shipPicker.children)) {
       node.classList.toggle(
@@ -209,6 +214,9 @@ export class PlacementController {
 
     paintBoard({ board: this.game.player.board, cells: this.game.ui.playerCells, showShips: true });
 
+    playerBoardEl.classList.toggle("board--interactive", this.game.phase === "placement");
+    playerBoardEl.classList.toggle("board--placement", this.game.phase === "placement");
+
     btnStart.disabled = !this.game.player.ready || this.waitingForBattleStart;
 
     const left = summarizeRemaining(this.game);
@@ -219,7 +227,7 @@ export class PlacementController {
         ? this.waitingForBattleStart
           ? "Wysłano gotowość. Czekanie na start."
           : "Gotowe. Kliknij Start."
-        : "Kliknij na planszę, aby rozstawić. Skrót: R — obrót.";
+        : "Kliknij na planszę, aby rozstawić. Skrót: R / Spacja — obrót.";
   }
 }
 
