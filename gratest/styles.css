@@ -148,6 +148,65 @@ body.no-anim *{
 .panel__title{font-weight:700;}
 .panel__meta{color:var(--muted);font-size:12px;}
 
+.panel__ships{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding:10px 14px 0;
+  min-height: 24px;
+}
+
+.shipicon{
+  --n: 3;
+  display:inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 10px;
+  gap:3px;
+  padding:5px 6px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(18,28,58,.45);
+}
+
+.shipicon::before{
+  content:"";
+  display:block;
+  width: calc(var(--n) * 13px - 3px);
+  height: 8px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(74,222,128,.85) 0 10px,
+      rgba(74,222,128,.85) 0 10px,
+      transparent 10px 13px
+    );
+  mask: linear-gradient(90deg, #000 0 100%);
+}
+
+.shipicon--sunk::before{
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(251,113,133,.90) 0 10px,
+      rgba(251,113,133,.90) 0 10px,
+      transparent 10px 13px
+    );
+  opacity:.55;
+}
+
+.shipicon--unknown::before{
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(234,240,255,.55) 0 10px,
+      rgba(234,240,255,.55) 0 10px,
+      transparent 10px 13px
+    );
+  opacity:.65;
+}
+
 .board{
   display:grid;
   grid-template-columns: repeat(10, 1fr);

@@ -7,6 +7,8 @@ export function renderStaticUI(game) {
   const status = qs("#status");
   const playerMeta = qs("#playerMeta");
   const enemyMeta = qs("#enemyMeta");
+  const playerShips = qs("#playerShips");
+  const enemyShips = qs("#enemyShips");
 
   subtitle.textContent = game.phase === "placement" ? "Rozstaw statki" : "Walka";
 
@@ -29,6 +31,8 @@ export function renderStaticUI(game) {
     status,
     playerMeta,
     enemyMeta,
+    playerShips,
+    enemyShips,
     playerBoardEl,
     enemyBoardEl,
     leftPanel,

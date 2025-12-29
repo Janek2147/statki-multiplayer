@@ -4,6 +4,7 @@ import { paintBoard } from "../renderBoard.js";
 import { aiPickShot, aiOnShotResult } from "../../ai/enemyAI.js";
 import { toast } from "../toast.js";
 import { mpIsInRoom, mpSendShot, mpSendShotResultWithUpdates } from "../../net/multiplayer.js";
+import { FLEET } from "../../state/constants.js";
 
 export class BattleController {
   constructor(game, { onFinished } = {}) {
@@ -45,8 +46,6 @@ export class BattleController {
           const updates = computeDefenderUpdates(this.game.player.board, idx, res);
           mpSendShotResultWithUpdates(mp, m.fromId, idx, res.result, res.win, updates);
 
-          this.refresh();
-
           if (res.win) {
             this.finish("Przegrałeś!");
             return;
@@ -59,6 +58,8 @@ export class BattleController {
             this.game.turn = "enemy";
             this.game.ui.status.textContent = "Tura przeciwnika";
           }
+
+          this.refresh();
         })
       );
 
@@ -85,8 +86,6 @@ export class BattleController {
             }
           }
 
-          this.refresh();
-
           if (m.win) {
             this.finish("Wygrałeś!");
             return;
@@ -100,6 +99,8 @@ export class BattleController {
             this.game.ui.status.textContent =
               m.result === "hit" ? "Trafienie! Strzelasz dalej." : "Zatopiony! Strzelasz dalej.";
           }
+
+          this.refresh();
         })
       );
     }
@@ -145,16 +146,17 @@ export class BattleController {
       return;
     }
 
-    this.refresh();
-
     if (res.result === "miss") {
       this.game.turn = "enemy";
       this.game.ui.status.textContent = "Tura przeciwnika";
+      this.refresh();
       await wait(420);
       if (this.disposed) return;
       await this.enemyTurn();
       return;
     }
+
+    this.refresh();
 
     if (res.result === "hit") {
       this.game.ui.status.textContent = "Trafienie! Strzelasz dalej.";
@@ -189,7 +191,6 @@ export class BattleController {
 
       aiOnShotResult(this.game.ai, idx, res.result);
       if (this.disposed) break;
-      this.refresh();
 
       if (res.win) {
         this.finish("Przegrałeś!");
@@ -199,8 +200,11 @@ export class BattleController {
       if (res.result === "miss") {
         this.game.turn = "player";
         this.game.ui.status.textContent = "Twoja tura";
+        this.refresh();
         break;
       }
+
+      this.refresh();
 
       await wait(380);
     }
@@ -220,6 +224,18 @@ export class BattleController {
     if (this.disposed) return;
     paintBoard({ board: this.game.player.board, cells: this.game.ui.playerCells, showShips: true });
     paintBoard({ board: this.game.enemy.board, cells: this.game.ui.enemyCells, showShips: false });
+
+    if (this.game.ui.playerShips) {
+      renderFleetIcons(this.game.ui.playerShips, this.game.player.board);
+    }
+
+    if (this.game.ui.enemyShips) {
+      if (this.game.mode === "multi" && typeof this.game.enemyShipsLeft === "number") {
+        renderUnknownFleetIcons(this.game.ui.enemyShips, this.game.enemyShipsLeft);
+      } else {
+        renderFleetIcons(this.game.ui.enemyShips, this.game.enemy.board);
+      }
+    }
 
     if (this.game.ui.leftPanel && this.game.ui.rightPanel) {
       this.game.ui.leftPanel.classList.toggle(
@@ -241,6 +257,35 @@ export class BattleController {
     this.game.ui.playerMeta.textContent = `Statków: ${pLeft}`;
     this.game.ui.enemyMeta.textContent = `Statków: ${eLeft}`;
   }
+}
+
+function renderFleetIcons(root, board) {
+  const byLen = new Map();
+  for (const s of board.ships || []) {
+    const len = s.cells?.length || 0;
+    if (!byLen.has(len)) byLen.set(len, []);
+    byLen.get(len).push(s);
+  }
+
+  const used = new Map();
+  let html = "";
+  for (const len of FLEET) {
+    const idx = used.get(len) || 0;
+    used.set(len, idx + 1);
+    const ship = (byLen.get(len) || [])[idx];
+    const sunk = !!ship?.sunk;
+    html += `<span class="shipicon ${sunk ? "shipicon--sunk" : ""}" style="--n:${len}"></span>`;
+  }
+  root.innerHTML = html;
+}
+
+function renderUnknownFleetIcons(root, left) {
+  const n = Math.max(0, Number(left) || 0);
+  let html = "";
+  for (let i = 0; i < n; i++) {
+    html += `<span class="shipicon shipicon--unknown" style="--n:3"></span>`;
+  }
+  root.innerHTML = html;
 }
 
 function computeDefenderUpdates(board, idx, res) {
