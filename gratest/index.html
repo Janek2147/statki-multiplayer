@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statki</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand__title">Statki</div>
+          <div class="brand__subtitle" id="subtitle">Rozstaw statki</div>
+        </div>
+        <div class="topbar__actions">
+          <button class="btn btn--ghost" id="btnNew">Nowa gra</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="panel" id="leftPanel">
+          <div class="panel__header">
+            <div class="panel__title">Ty</div>
+            <div class="panel__meta" id="playerMeta"></div>
+          </div>
+          <div class="board" id="playerBoard" aria-label="Twoja plansza"></div>
+
+          <div class="toolbar" id="placementToolbar">
+            <div class="toolbar__row">
+              <div class="label">Statek</div>
+              <div class="seg" id="shipPicker"></div>
+            </div>
+            <div class="toolbar__row">
+              <div class="label">Orientacja</div>
+              <div class="seg" id="orientationPicker"></div>
+            </div>
+            <div class="toolbar__row toolbar__row--buttons">
+              <button class="btn" id="btnRandomize">Losuj ustawienie</button>
+              <button class="btn btn--primary" id="btnStart" disabled>Start</button>
+            </div>
+            <div class="hint" id="placementHint">Kliknij na planszę, aby rozstawić. Skrót: R — obrót.</div>
+          </div>
+        </section>
+
+        <section class="panel" id="rightPanel">
+          <div class="panel__header">
+            <div class="panel__title">Przeciwnik</div>
+            <div class="panel__meta" id="enemyMeta"></div>
+          </div>
+          <div class="board board--interactive" id="enemyBoard" aria-label="Plansza przeciwnika"></div>
+
+          <div class="status" id="status"></div>
+        </section>
+
+        <aside class="panel side" id="sidePanel">
+          <div class="panel__header">
+            <div class="panel__title">Multiplayer</div>
+            <div class="panel__meta" id="netMeta"></div>
+          </div>
+          <div class="side__body">
+            <div class="users" id="usersPanel"></div>
+          </div>
+        </aside>
+      </main>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <div class="toast" id="fileWarning" role="status" aria-live="polite" style="bottom:64px"></div>
+
+    <script>
+      (function () {
+        if (location.protocol !== "file:") return;
+
+        var warn = document.getElementById("fileWarning");
+        if (warn) {
+          warn.textContent =
+            "Ta gra wymaga uruchomienia przez serwer HTTP (nie przez file://). Uruchom: python3 -m http.server i wejdź przez http://127.0.0.1:5173";
+          warn.classList.add("toast--show");
+        }
+
+        var btnNew = document.getElementById("btnNew");
+        var btnStart = document.getElementById("btnStart");
+        var btnRandomize = document.getElementById("btnRandomize");
+        if (btnNew) btnNew.disabled = true;
+        if (btnStart) btnStart.disabled = true;
+        if (btnRandomize) btnRandomize.disabled = true;
+      })();
+    </script>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
