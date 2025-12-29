@@ -133,8 +133,11 @@ body{
 .cell:hover{border-color: rgba(106,166,255,.35);}
 
 .cell--ship{
-  background: linear-gradient(180deg, rgba(106,166,255,.22), rgba(124,92,255,.10)),
+  border-color: rgba(106,166,255,.55);
+  background: radial-gradient(26px 26px at 35% 30%, rgba(234,240,255,.18), transparent 60%),
+              linear-gradient(180deg, rgba(106,166,255,.40), rgba(124,92,255,.22)),
               linear-gradient(180deg, rgba(34,49,92,.9), rgba(24,35,72,.75));
+  box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 0 0 1px rgba(106,166,255,.12), 0 0 18px rgba(106,166,255,.18);
 }
 
 .cell--preview-ok{
